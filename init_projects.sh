@@ -1,9 +1,11 @@
 #!/bin/bash
 
-projects=(`curl -s https://api.github.com/orgs/lutece-platform/repos | awk '/"name"/ { print substr($2,2,length($2)-3) }' | grep lutece`)
+projects=(`curl -s https://api.github.com/orgs/lutece-platform/repos | awk '/"name"/ { project=substr($2,2,length($2)-3) } /"clone_url"/ { print project ";" substr($2,2,length($2)-3)}' | grep "^lutece"`)
 
-for project in ${projects[*]} 
+for projectandurl in ${projects[*]} 
 do
+	project=`echo ${projectandurl} | cut -d ';' -f 1`
+	url=`echo ${projectandurl} | cut -d ';' -f 2`
 	category=`echo ${project} | cut -d '-' -f 2`
 	if [[ ${category} == "core" ]]
 	then
@@ -18,7 +20,6 @@ do
 		echo "--------------------------------------------------------------------------------"
 		echo " Cloning component : ${project}"
 		echo "--------------------------------------------------------------------------------"
-		url="https://github.com/lutece-platform/${project}.git"
 		git clone ${url} ${path}
 		echo " "
 	fi
