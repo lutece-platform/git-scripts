@@ -28,10 +28,22 @@ lutece-system-plugin-updater
 
 for project in ${projects[*]} 
 do
-	echo "--------------------------------------------------------------------------------"
-	echo " Cloning component : ${project}"
-	echo "--------------------------------------------------------------------------------"
-	url="https://github.com/lutece-platform/${project}.git"
-	git clone ${url}
-	echo " "
+	category=`echo ${project} | cut -d '-' -f 2`
+	if [[ ${category} == "core" ]]
+	then
+		path="${project}"
+	else
+		path="plugins/${category}/${project}"
+	fi
+	if [[ -d $path ]]
+	then
+		echo "${project} already cloned in ${path}"
+	else
+		echo "--------------------------------------------------------------------------------"
+		echo " Cloning component : ${project}"
+		echo "--------------------------------------------------------------------------------"
+		url="https://github.com/lutece-platform/${project}.git"
+		git clone ${url} ${path}
+		echo " "
+	fi
 done;
