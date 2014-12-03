@@ -1,6 +1,40 @@
 #!/bin/bash
 
-projects=(`curl -s https://api.github.com/orgs/lutece-platform/repos | awk '/"name"/ { project=substr($2,2,length($2)-3) } /"clone_url"/ { print project ";" substr($2,2,length($2)-3)}' | grep "^lutece"`)
+function usage {
+	echo "Usage: `basename $0` [-t git|ssh|https]"
+	echo " -t: clone type; default is https"
+}
+
+urltype="clone_url"
+while getopts ":t:" opt; do
+	case $opt in
+		t)
+			case $OPTARG in
+				git)
+					urltype="git_url"
+					;;
+				ssh)
+					urltype="ssh_url"
+					;;
+				https)
+					urltype="clone_url"
+					;;
+				*)
+					echo "Invalid clone type $OPTARG" >&2
+					usage
+					exit 1
+			esac
+			;;
+		:)
+			echo "Option -$OPTARG requires an argument" >&2
+			usage
+			exit 1
+			;;
+	esac
+done
+
+awkProg="/\"name\"/ { project=substr(\$2,2,length(\$2)-3) } /\"$urltype\"/ { print project \";\" substr(\$2,2,length(\$2)-3)}"
+projects=(`curl -s https://api.github.com/orgs/lutece-platform/repos | awk "$awkProg" | grep "^lutece"`)
 
 for projectandurl in ${projects[*]} 
 do
