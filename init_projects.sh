@@ -1,37 +1,60 @@
 #!/bin/bash
 
-projects=( lutece-core \
-lutece-dev-plugin-codewizard \ 
-lutece-dev-plugin-pluginwizard \
-lutece-document-module-cmis \ 
-lutece-elk-module-elasticsearch-head \
-lutece-elk-module-elasticsearch-statsfilter \
-lutece-elk-plugin-elasticsearch \ 
-lutece-elk-plugin-kibana \
-lutece-multimedia-plugin-phraseanet \
-lutece-report-plugin-dataviz \
-lutece-report-plugin-graphite \
-lutece-seo-plugin-seo \
-lutece-seo-module-seo-crm \
-lutece-seo-module-seo-digglike \
-lutece-seo-module-seo-document \
-lutece-seo-module-seo-robots \
-lutece-seo-module-seo-wiki \
-lutece-seo-plugin-searchstats \
-lutece-search-library-lucene \
-lutece-site-plugin-gtools \
-lutece-site-plugin-sitelabels \
-lutece-system-plugin-jmx \
-lutece-system-plugin-jmxtrans \
-lutece-system-plugin-updater
-);
+function usage {
+	echo "Usage: `basename $0` [-t git|ssh|https]"
+	echo " -t: clone type; default is https"
+}
 
-for project in ${projects[*]} 
+urltype="clone_url"
+while getopts ":t:" opt; do
+	case $opt in
+		t)
+			case $OPTARG in
+				git)
+					urltype="git_url"
+					;;
+				ssh)
+					urltype="ssh_url"
+					;;
+				https)
+					urltype="clone_url"
+					;;
+				*)
+					echo "Invalid clone type $OPTARG" >&2
+					usage
+					exit 1
+			esac
+			;;
+		:)
+			echo "Option -$OPTARG requires an argument" >&2
+			usage
+			exit 1
+			;;
+	esac
+done
+
+awkProg="/\"name\"/ { project=substr(\$2,2,length(\$2)-3) } /\"$urltype\"/ { print project \";\" substr(\$2,2,length(\$2)-3)}"
+projects=(`curl -s https://api.github.com/orgs/lutece-platform/repos | awk "$awkProg" | grep "^lutece"`)
+
+for projectandurl in ${projects[*]} 
 do
-	echo "--------------------------------------------------------------------------------"
-	echo " Cloning component : ${project}"
-	echo "--------------------------------------------------------------------------------"
-	url="https://github.com/lutece-platform/${project}.git"
-	git clone ${url}
-	echo " "
+	project=`echo ${projectandurl} | cut -d ';' -f 1`
+	url=`echo ${projectandurl} | cut -d ';' -f 2`
+	category=`echo ${project} | cut -d '-' -f 2`
+	if [[ ${category} == "core" ]]
+	then
+		path="${project}"
+	else
+		path="plugins/${category}/${project}"
+	fi
+	if [[ -d $path ]]
+	then
+		echo "${project} already cloned in ${path}"
+	else
+		echo "--------------------------------------------------------------------------------"
+		echo " Cloning component : ${project}"
+		echo "--------------------------------------------------------------------------------"
+		git clone ${url} ${path}
+		echo " "
+	fi
 done;

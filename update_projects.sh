@@ -1,10 +1,10 @@
 #!/bin/bash
-for filename in lutece-*/; do
+for filename in `find . -type d -name "lutece-*"`; do
 	echo "--------------------------------------------------------------------------------"
 	echo " Updating $filename "
 	echo "--------------------------------------------------------------------------------"
-	cd $filename
+	pushd $filename
         git pull origin master
-        cd .. 
+        popd
 	echo " "
 done
