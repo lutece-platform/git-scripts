@@ -34,7 +34,7 @@ while getopts ":t:" opt; do
 done
 
 awkProg="/\"name\"/ { project=substr(\$2,2,length(\$2)-3) } /\"$urltype\"/ { print project \";\" substr(\$2,2,length(\$2)-3)}"
-projects=(`curl -s https://api.github.com/orgs/lutece-platform/repos | awk "$awkProg" | grep "^lutece"`)
+projects=(`curl -s https://api.github.com/orgs/lutece-platform/repos?per_page=100 | awk "$awkProg" | grep "^lutece"`)
 
 for projectandurl in ${projects[*]} 
 do
