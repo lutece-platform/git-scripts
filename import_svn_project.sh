@@ -32,6 +32,12 @@ echo "Conversion des auteurs"
 echo "Liste de auteurs"
 git shortlog -s
 git remote add origin ${repo}
+
+echo "Ajout de fichier .gitignore pour les dossiers vides"
+find . \( ! -regex '.*/\..*/..*' \) -type d -empty -exec touch {}/.gitignore \;
+git add -A
+git commit -m "Adding .gitignore on empty folder"
+
 git push -u origin master
 cd ..
 
