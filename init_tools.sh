@@ -45,7 +45,7 @@ do
 	then
 		path="${project}"
 	else
-		path="plugins/${category}/${project}"
+		path="tools/${category}/${project}"
 	fi
 	if [[ -d $path ]]
 	then
