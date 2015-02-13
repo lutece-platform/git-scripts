@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DEVELOP="develop2"
+DEVELOP="develop"
 
 function currentBranch() {
 	CURRENTBRANCH=$(git branch -l | grep '*' | cut -d ' ' -f 2)
