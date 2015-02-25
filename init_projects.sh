@@ -20,6 +20,48 @@ function getUserInfos() {
 	fi
 }
 
+function setUserInfos() {
+	if [ -z "$1" -o ! -d "$1" ]; then
+		echo "This path is not a git repository"
+	fi
+		git --git-dir="$1/.git" --work-tree="$1" config user.email "${EMAIL}"
+		git --git-dir="$1/.git" --work-tree="$1" config user.name "${NAME}"
+}
+
+# retrieving all projects with url in format :
+# project1;url1 project2;url2 ;...
+# parameter 1 : the organization
+# Parameter 2 : URL type
+function getProjectsAndUrls() {
+	getReposInfo "$1" "/\"name\"/ { project=substr(\$2,2,length(\$2)-3) } /\"$2\"/ { print project \";\" substr(\$2,2,length(\$2)-3)}"
+
+}
+
+# Retrieving all repos informations
+# Parameter 1 : the organization
+# Parameter 2 : awk argument
+function getReposInfo() {
+	if [ $# -lt 2 ]; then
+		echo -n
+		return 1
+	fi
+	org="$1"
+	awkProg="$2"
+	i=1
+	# loop due to github API limitation (only 100 projects per request)
+	while [ $i -ne 0 ]; do
+		tmp=$(curl -s "https://api.github.com/orgs/${org}/repos?per_page=100&page=$i" | awk "${awkProg}")
+		if [ "x$tmp" = "x" ]; then
+		# no more result or max request exceeded
+		# TODO: check if max limite is reacheed
+			i=0
+		else
+			echo -n "$tmp "
+			let i=$i+1
+		fi
+	done
+}
+
 function usage {
 	echo "Usage: `basename $0` [-t git|ssh|https]"
 	echo " -t: clone type; default is https"
@@ -55,8 +97,7 @@ done
 
 getUserInfos
 
-awkProg="/\"name\"/ { project=substr(\$2,2,length(\$2)-3) } /\"$urltype\"/ { print project \";\" substr(\$2,2,length(\$2)-3)}"
-projects=(`curl -s https://api.github.com/orgs/lutece-platform/repos?per_page=500 | awk "$awkProg" | grep "^lutece"`)
+projects=(`getProjectsAndUrls lutece-platform $urltype | grep "^lutece"`)
 
 for projectandurl in ${projects[*]} 
 do
@@ -80,8 +121,8 @@ do
 		git clone ${url} ${path}
 		git --git-dir="${path}/.git" --work-tree="${path}" checkout -b develop
 		git --git-dir="${path}/.git" --work-tree="${path}" pull origin develop
-		git --git-dir="${path}/.git" --work-tree="${path}" config user.email "${EMAIL}"
-		git --git-dir="${path}/.git" --work-tree="${path}" config user.name "${NAME}"
+		git --git-dir="${path}/.git" --work-tree="${path}" branch --set-upstream-to=origin/develop
+		setUserInfos "${path}"
 		echo " "
 	fi
 done;
