@@ -153,7 +153,7 @@ function getLocalProjects() {
 		path="$(cd "${BASEPATH}/$gitDir/.." && pwd -P)"
 		project="$(basename "$path")"
 		LOCALPROJECTS[${#LOCALPROJECTS[@]}]="${project};$path"
-	done
+	done; unset IFS
 	cd - > /dev/null
 }
 
@@ -176,7 +176,7 @@ function projectInfos() {
 				PROJECTINFO=( "$category" ${project[@]} )
 				return 0
 			fi
-		done
+		done; unset IFS
 	fi
 	return 1
 }
