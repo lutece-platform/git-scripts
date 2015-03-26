@@ -23,12 +23,12 @@ function checkEnv() {
 function getScripts() {
 	url="https://github.com/lutece-platform/tools-git-scripts"
 	TMPDIR="/tmp/tmp.$$"
-#	git clone "$url" "${TMPDIR}" ${QUIET}
+	git clone "$url" "${TMPDIR}" ${QUIET}
 	# TODO: Comment it !
 	# during development
-#	git --git-dir="${TMPDIR}/.git" --work-tree="${TMPDIR}" checkout -b develop origin/develop
-	rsync -a /home/cmarneux/svn/lutece/tools-git-scripts/ "${TMPDIR}"
-	return $return
+	git --git-dir="${TMPDIR}/.git" --work-tree="${TMPDIR}" checkout -b develop origin/develop
+#	rsync -a /home/cmarneux/svn/lutece/tools-git-scripts/ "${TMPDIR}"
+	return $?
 }
 
 # clear temp folders/files then exit
