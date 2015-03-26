@@ -47,7 +47,7 @@ function parseParams() {
 		fi
 	done
 	if [  -z "$ACTION" ]; then
-		usage "Unknown action: $1"
+		usage "Unknown action: $act"
 	fi
 	shift
 	CLONETYPE="clone_url"
