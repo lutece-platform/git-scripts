@@ -75,7 +75,7 @@ for projectandurl in ${projects[@]} ; do
 		git --git-dir="${path}/.git" --work-tree="${path}" pull ${QUIET}
 		git --git-dir="${path}/.git" --work-tree="${path}" checkout ${QUIET} $currentBranch
 echo "$path"
-ls "$path"
+ls -a "$path"
 		continue
 	fi
 	echo "--------------------------------------------------------------------------------"
