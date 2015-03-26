@@ -68,7 +68,7 @@ for projectandurl in ${projects[@]} ; do
 		fi
 		# try to update...
 		# TODO: check if modifications not commited before changing branches...
-		currentBranch="$(git rev-parse --abbrev-ref HEAD)"
+		currentBranch="$(git --git-dir="${path}/.git" --work-tree="${path}" rev-parse --abbrev-ref HEAD)"
 		git --git-dir="${path}/.git" --work-tree="${path}" checkout ${QUIET} master
 		git --git-dir="${path}/.git" --work-tree="${path}" pull ${QUIET}
 		git --git-dir="${path}/.git" --work-tree="${path}" checkout ${QUIET} develop
