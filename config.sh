@@ -1,6 +1,9 @@
 #!/bin/bash
 
-getLocalProjects
+if [ -z "${USERNAME}" ]; then
+	NAME=""
+	EMAIL=""
+fi
 getUserInfos
 error $? "You have to validate your primary email in github."
 

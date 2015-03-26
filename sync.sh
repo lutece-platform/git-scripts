@@ -45,7 +45,6 @@ getUserInfos
 error $? "You have to validate your primary email in github."
 
 projects=(`getProjectsAndUrls lutece-platform $CLONETYPE | grep "^lutece"`)
-getLocalProjects
 
 for projectandurl in ${projects[@]} ; do
 	data=( $(echo $projectandurl | sed "s/^lutece\-\([^\-]*\)\(\-\([^;]*\)\)\{0,1\};\(.*\)$/\1 \3 \4/g") )

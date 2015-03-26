@@ -110,7 +110,7 @@ function getUserInfos() {
 	while [ -z "${NAME}" ]; do
 		read -p "Enter your first name and your last name : " NAME
 	done
-	while [ -z "${USERNAME}" ]; do
+	while [ -z "${EMAIL}" -a -z "${USERNAME}" ]; do
 		read -p "Enter your github's username : " USERNAME
 	done
 	for attempt in 1 2 3; do
@@ -185,4 +185,11 @@ function projectInfos() {
 parseParams $@
 nextParameter=$?
 getPath $nextParameter $@
+getLocalProjects
+# set NAME and EMAIL with first already cloned repository if not set in command line
+if [ -z "${NAME}" -a -z "${EMAIL}" -a ${#LOCALPROJECTS[@]} -gt 0 ]; then
+	path="$(echo "${LOCALPROJECTS[0]}" | cut -d ';' -f 2)"
+	NAME="$(git --git-dir="${path}/.git" --work-tree="${path}" config user.name)"
+	EMAIL="$(git --git-dir="${path}/.git" --work-tree="${path}" config user.email)"
+fi
 source "${TMPDIR}/${ACTION}.sh"
