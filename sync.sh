@@ -53,6 +53,11 @@ for projectandurl in ${projects[@]} ; do
 		# project is empty so URL is in PROJECT index
 		data[$URL]="${data[$PROJECT]}"
 		data[$PROJECT]="lutece-core"
+	elif [ "${data[$CATEGORY]}" = "platform.github.io" ]; then
+		path="${BASEPATH}/lutece-platform.github.io"
+		# project is empty so URL is in PROJECT index
+		data[$URL]="${data[$PROJECT]}"
+		data[$PROJECT]="lutece-platform.github.io"
 	else
 		path="${BASEPATH}/plugins/${data[$CATEGORY]}/${data[$PROJECT]}"
 	fi
@@ -63,7 +68,7 @@ for projectandurl in ${projects[@]} ; do
 		error "Updating component : ${data[$PROJECT]}"
 		# if category changed...
 		if [ "${data[$CATEGORY]}" != "${PROJECTINFO[$CATEGORY]}" ]; then
-			mv "${PROJECTINFO[$URL]}" "$path"
+			mv "${PROJECTINFO[$URL]%/}" "$path"
 			MESSAGES[${#MESSAGES[@]}]="Moved project ${data[$PROJECT]} from category ${PROJECTINFO[$CATEGORY]} to ${data[$CATEGORY]}"
 		fi
 		# try to update...

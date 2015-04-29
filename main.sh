@@ -152,6 +152,14 @@ function getLocalProjects() {
 		unset IFS
 		path="$(cd "${BASEPATH}/$gitDir/.." && pwd -P)"
 		project="$(basename "$path")"
+		# check for old init_projects.sh
+		if [ "$project" != "lutece-platform.github.io" -a "$project" != "lutece-core" ]; then
+			if [[ "$project" == lutece-* ]]; then
+				categoryPath="$(dirname "$path")"
+				project="$(echo "$project" | sed 's/^lutece-[^\-]*-//g')"
+				mv "$path" "${categoryPath}/$project"
+			fi
+		fi
 		LOCALPROJECTS[${#LOCALPROJECTS[@]}]="${project};$path"
 	done; unset IFS
 	cd - > /dev/null
@@ -170,6 +178,8 @@ function projectInfos() {
 			if [ "$1" = "${project[0]}" ]; then
 				if [ "${project[0]}" = "lutece-core" ]; then
 					category="core"
+				elif [ "${project[0]}" = "lutece-platform.github.io" ]; then
+					category="platform"
 				else
 					category="$(basename "`dirname "${project[1]}"`")"
 				fi
