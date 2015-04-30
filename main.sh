@@ -179,7 +179,7 @@ function projectInfos() {
 				if [ "${project[0]}" = "lutece-core" ]; then
 					category="core"
 				elif [ "${project[0]}" = "lutece-platform.github.io" ]; then
-					category="platform"
+					category="platform.github.io"
 				else
 					category="$(basename "`dirname "${project[1]}"`")"
 				fi
