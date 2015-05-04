@@ -68,8 +68,16 @@ for projectandurl in ${projects[@]} ; do
 		error "Updating component : ${data[$PROJECT]}"
 		# if category changed...
 		if [ "${data[$CATEGORY]}" != "${PROJECTINFO[$CATEGORY]}" ]; then
-			mv "${PROJECTINFO[$URL]%/}" "$path"
-			MESSAGES[${#MESSAGES[@]}]="Moved project ${data[$PROJECT]} from category ${PROJECTINFO[$CATEGORY]} to ${data[$CATEGORY]}"
+echo ${data[@]} 
+echo ${PROJECTINFO[@]}
+echo "${PROJECTINFO[$URL]%/}"
+echo $path
+			if [ -d "$path" ]; then
+				MESSAGES[${#MESSAGES[@]}]="Can not moved project ${data[$PROJECT]} from category ${PROJECTINFO[$CATEGORY]} to ${data[$CATEGORY]} because $path already exists!"
+			else
+				mv "${PROJECTINFO[$URL]%/}" "$path"
+				MESSAGES[${#MESSAGES[@]}]="Moved project ${data[$PROJECT]} from category ${PROJECTINFO[$CATEGORY]} to ${data[$CATEGORY]}"
+			fi # end if destination path already exists
 		fi
 		# try to update...
 		# TODO: check if modifications not commited before changing branches...
