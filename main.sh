@@ -5,7 +5,7 @@ set -u
 EMAIL=""
 USERNAME=""
 NAME=""
-GITHOOKS=0
+GITHOOKS=1
 QUIET=("-q")
 LOCALPROJECTS=()
 PROJECTINFOS=()
@@ -61,7 +61,7 @@ function parseParams() {
 			USERNAME="unused"
 			;;
 		k)
-			GITHOOKS=1
+			GITHOOKS=0
 			;;
 		u)
 			NAME="$OPTARG"

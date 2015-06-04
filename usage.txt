@@ -11,7 +11,7 @@ Options
 		-e
 			set email
 		-k
-			use hooks
+			do not use hooks
 		-u
 			set first name and last name
 	sync
