@@ -1,0 +1,28 @@
+Usage: lutece.sh <action> [options]
+
+Actions
+	sync   - clone/update/move projects for git hub
+	config - Specify configuration for git
+
+Options
+	global
+		-d
+			enable debug mode
+		-e
+			set email
+		-k
+			do not use hooks
+		-u
+			set first name and last name
+	sync
+		-t <protocol>
+			use this protocol for cloning (available: http, https, git and ssh; default is https)
+
+Examples
+	initial sync
+		lutece.sh sync -t ssh
+	initial sync without prompt
+		lutece.sh sync -t https -e jeannmartin@paris.fr -u "Jean Martin"
+	I want to use hooks !
+			lutece.sh config -k
+			lutece.sh sync -k
