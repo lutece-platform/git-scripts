@@ -23,6 +23,6 @@ Examples
 		lutece.sh sync -t ssh
 	initial sync without prompt
 		lutece.sh sync -t https -e jeannmartin@paris.fr -u "Jean Martin"
-	I want to use hooks !
+	I do not want to use hooks !
 			lutece.sh config -k
 			lutece.sh sync -k

@@ -192,9 +192,9 @@ function projectInfos() {
 }
 
 ## Starting scripts...
-parseParams $@
+parseParams "$@"
 nextParameter=$?
-getPath $nextParameter $@
+getPath $nextParameter "$@"
 getLocalProjects
 # set NAME and EMAIL with first already cloned repository if not set in command line
 if [ -z "${NAME}" -a -z "${EMAIL}" -a ${#LOCALPROJECTS[@]} -gt 0 ]; then

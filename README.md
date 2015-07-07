@@ -35,4 +35,4 @@ https://raw.githubusercontent.com/lutece-platform/tools-git-scripts/master/lutec
 
 == run the script ==
 === Linux ===
-=== Winfows ===
+=== Windows ===
