@@ -4,50 +4,16 @@
 CATEGORY=0
 PROJECT=1
 URL=2
-
-# retrieving all projects with url in format :
-# project1;url1 project2;url2 ;...
-# parameter 1 : the organization
-# Parameter 2 : URL type
-function getProjectsAndUrls() {
-	error "Retrieving projects list..."
-	getReposInfo "$1" "/\"name\"/ { project=substr(\$2,2,length(\$2)-3) } /\"$2\"/ { print project \";\" substr(\$2,2,length(\$2)-3)}"
-	return $?
-}
-
-# Retrieving all repos informations
-# Parameter 1 : the organization
-# Parameter 2 : awk argument
-function getReposInfo() {
-	if [ $# -lt 2 ]; then
-		echo -n
-		return 1
-	fi
-	org="$1"
-	awkProg="$2"
-	i=1
-	# loop due to github API limitation (only 100 projects per request)
-	while [ $i -ne 0 ]; do
-		tmp=$(curl -s "https://api.github.com/orgs/${org}/repos?per_page=100&page=$i" | awk "${awkProg}")
-		if [ "x$tmp" = "x" ]; then
-		# no more result or max request exceeded
-		# TODO: check if max limite is reacheed
-			i=0
-		else
-			echo -n "$tmp "
-			let i=$i+1
-		fi
-	done
-	return 0
-}
+ORGANIZATION=3
 
 getUserInfos
 error $? "You have to validate your primary email in github."
 
-projects=(`getProjectsAndUrls lutece-platform $CLONETYPE | grep "^lutece"`)
+error "Retrieving projects list..."
+projects=(`getProjectsAndUrls lutece-platform $CLONETYPE | grep "^lutece"` `getProjectsAndUrls lutece-secteur-public $CLONETYPE`)
 
 for projectandurl in ${projects[@]} ; do
-	data=( $(echo $projectandurl | sed "s/^lutece\-\([^\-]*\)\(\-\([^;]*\)\)\{0,1\};\(.*\)$/\1 \3 \4/g") )
+	data=( $(echo $projectandurl | sed "s/^\([A-Za-z]*\)\-\([^\-]*\)\(\-\([^;]*\)\)\{0,1\};\(.*\)$/\2 \4 \5 \1/g") )
 	if [ "${data[$CATEGORY]}" = "core" ]; then
 		path="${BASEPATH}/lutece-core"
 		# project is empty so URL is in PROJECT index
@@ -59,7 +25,14 @@ for projectandurl in ${projects[@]} ; do
 		data[$URL]="${data[$PROJECT]}"
 		data[$PROJECT]="lutece-platform.github.io"
 	else
-		path="${BASEPATH}/plugins/${data[$CATEGORY]}/${data[$PROJECT]}"
+		if [ "${data[ORGANIZATION]}" == "lutece" ]; then
+			syncPath="${BASEPATH}/plugins"
+		else
+			syncPath="${BASEPATH}/plugins"
+		data[$PROJECT]="${data[$CATEGORY]}-${data[$PROJECT]}"
+		data[$CATEGORY]="${data[$ORGANIZATION]}"
+		fi
+		path="${syncPath}/${data[$CATEGORY]}/${data[$PROJECT]}"
 	fi
 	# check if category changed...
 	projectInfos "${data[$PROJECT]}"
@@ -68,10 +41,6 @@ for projectandurl in ${projects[@]} ; do
 		error "Updating component : ${data[$PROJECT]}"
 		# if category changed...
 		if [ "${data[$CATEGORY]}" != "${PROJECTINFO[$CATEGORY]}" ]; then
-echo ${data[@]} 
-echo ${PROJECTINFO[@]}
-echo "${PROJECTINFO[$URL]%/}"
-echo $path
 			if [ -d "$path" ]; then
 				MESSAGES[${#MESSAGES[@]}]="Can not moved project ${data[$PROJECT]} from category ${PROJECTINFO[$CATEGORY]} to ${data[$CATEGORY]} because $path already exists!"
 			else
@@ -93,8 +62,24 @@ echo $path
 	echo " Cloning component : ${data[$PROJECT]}"
 	echo "--------------------------------------------------------------------------------"
 	git clone ${QUIET} ${data[$URL]} ${path}
-	git --git-dir="${path}/.git" --work-tree="${path}" checkout ${QUIET} -b develop origin/develop
-	git --git-dir="${path}/.git" --work-tree="${path}" pull ${QUIET}
+	currentBranch="$(git --git-dir="${path}/.git" --work-tree="${path}" rev-parse --abbrev-ref HEAD)"
+	if [ "$currentBranch" = "master" ]; then
+		nextBranch="develop"
+	elif [ "$currentBranch" == "develop" ]; then
+		nextBranch="master"
+	else
+		MESSAGES[${#MESSAGES[@]}]="WARNING: No branch master or develop found in project ${data[$PROJECT]}"
+		continue
+	fi
+	git --git-dir="${path}/.git" --work-tree="${path}" checkout ${QUIET} -b $nextBranch origin/$nextBranch
+	status=$?
+	if [ $status -eq 0 ]; then
+		git --git-dir="${path}/.git" --work-tree="${path}" pull ${QUIET}
+	elif [ $status -eq 128 ]; then
+		MESSAGES[${#MESSAGES[@]}]="FATAL: the $nextBranch branch is missing in project ${data[$PROJECT]} in ${data[$CATEGORY]} category."
+	else
+		MESSAGES[${#MESSAGES[@]}]="FATAL: Unknown error in GIT in project ${data[$PROJECT]} in ${data[$CATEGORY]} category (return $status)."
+	fi
 	setUserInfos "${path}"
 	error $?	"This path is not a git repository"
 	echo " "

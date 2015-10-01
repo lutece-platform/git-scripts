@@ -1,31 +1,19 @@
 #!/bin/bash
 set -u
 
+# Static variables
+SEARCH_LOCAL=1
+SEARCH_REMOTE=2
+
 ## variables
 EMAIL=""
 USERNAME=""
 NAME=""
 GITHOOKS=1
 QUIET=("-q")
+SEARCH_TYPE=$SEARCH_LOCAL
 LOCALPROJECTS=()
 PROJECTINFOS=()
-
-# display error message in STDERR
-# Parameter 1 : return code - if 0 did not display error otherwise display it.
-# Parameter 2 : the error message
-function error() {
-	code="$1"
-	# if not a number...
-	if [ -z "$(echo "$code" | grep -E "^[0-9]+$")" ]; then
-		echo $@
-	else
-		shift
-		if [ $code -gt 0 ]; then
-			echo $@ >&2
-			customExit $code
-		fi
-	fi
-}
 
 # display usage then exit with code 2
 function usage() {
@@ -40,7 +28,7 @@ function parseParams() {
 	else
 		act=""
 	fi
-	for action in sync config; do
+	for action in sync config search; do
 		if [ "$action" = "$act" ]; then
 			ACTION="$action"
 			break
@@ -51,7 +39,7 @@ function parseParams() {
 	fi
 	shift
 	CLONETYPE="clone_url"
-	while getopts ":de:kt:u:" opt; do
+	while getopts ":de:klrt:u:" opt; do
 		case $opt in
 		d)
 			QUIET=""
@@ -63,8 +51,11 @@ function parseParams() {
 		k)
 			GITHOOKS=0
 			;;
-		u)
-			NAME="$OPTARG"
+		l)
+			SEARCH_TYPE=$SEARCH_LOCAL
+			;;
+		r)
+			SEARCH_TYPE=$SEARCH_REMOTE
 			;;
 		t)
 			case $(echo $OPTARG | tr '[A-Z]' '[a-z]') in
@@ -80,6 +71,9 @@ function parseParams() {
 				*)
 					error 10 "$OPTARG is an invalid clone type"
 			esac
+			;;
+		u)
+			NAME="$OPTARG"
 			;;
 		:)
 			rror 2 "The option -$OPTARG requires an argument"
@@ -144,52 +138,7 @@ function setUserInfos() {
 	return 0
 }
 
-# Retrieve list of projects already cloned
-function getLocalProjects() {
-	LOCALPROJECTS=()
-	cd "${BASEPATH}"
-	IFS=$'\n'; for gitDir in $(find -type d -name .git); do
-		unset IFS
-		path="$(cd "${BASEPATH}/$gitDir/.." && pwd -P)"
-		project="$(basename "$path")"
-		# check for old init_projects.sh
-		if [ "$project" != "lutece-platform.github.io" -a "$project" != "lutece-core" ]; then
-			if [[ "$project" == lutece-* ]]; then
-				categoryPath="$(dirname "$path")"
-				project="$(echo "$project" | sed 's/^lutece-[^\-]*-//g')"
-				mv "$path" "${categoryPath}/$project"
-			fi
-		fi
-		LOCALPROJECTS[${#LOCALPROJECTS[@]}]="${project};$path"
-	done; unset IFS
-	cd - > /dev/null
-}
-
-# get path of already cloned project
-# Parameter 1: project name
-# return 0 and set variable PROJECTINFO=( "category" "project name" "path" )
-# or returns 1 if not cloned yet
-function projectInfos() {
-	PROJECTINFO=()
-	if [ $# -gt 0 -a ${#LOCALPROJECTS[@]} -gt 0 ]; then
-		IFS=$'\n'; for projectinfo in ${LOCALPROJECTS[@]}; do
-		unset IFS
-			project=( $(echo "$projectinfo" | sed "s/^\([^;]*\);\(.*\)$/\1 \2/g") )
-			if [ "$1" = "${project[0]}" ]; then
-				if [ "${project[0]}" = "lutece-core" ]; then
-					category="core"
-				elif [ "${project[0]}" = "lutece-platform.github.io" ]; then
-					category="platform.github.io"
-				else
-					category="$(basename "`dirname "${project[1]}"`")"
-				fi
-				PROJECTINFO=( "$category" ${project[@]} )
-				return 0
-			fi
-		done; unset IFS
-	fi
-	return 1
-}
+source "${TMPDIR}/tools.sh"
 
 ## Starting scripts...
 parseParams "$@"
