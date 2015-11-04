@@ -3,6 +3,7 @@ Usage: lutece.sh <action> [options]
 Actions
 	sync   - clone/update/move projects for git hub
 	config - Specify configuration for git
+	search - Search project
 
 Options
 	global
@@ -17,6 +18,12 @@ Options
 	sync
 		-t <protocol>
 			use this protocol for cloning (available: http, https, git and ssh; default is https)
+
+	search
+		-l 
+			search only in local directories (default)
+		-r
+			Search only in github
 
 Examples
 	initial sync
