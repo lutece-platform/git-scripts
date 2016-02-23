@@ -44,6 +44,7 @@ for projectandurl in ${projects[@]} ; do
 			if [ -d "$path" ]; then
 				MESSAGES[${#MESSAGES[@]}]="Can not moved project ${data[$PROJECT]} from category ${PROJECTINFO[$CATEGORY]} to ${data[$CATEGORY]} because $path already exists!"
 			else
+				mkdir -p "$(dirname "$path")"
 				mv "${PROJECTINFO[$URL]%/}" "$path"
 				MESSAGES[${#MESSAGES[@]}]="Moved project ${data[$PROJECT]} from category ${PROJECTINFO[$CATEGORY]} to ${data[$CATEGORY]}"
 			fi # end if destination path already exists
