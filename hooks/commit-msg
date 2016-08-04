@@ -27,7 +27,7 @@ bug="$(grep -v '^#' "$1" | sed -n 's/^\s*\([A-Z]*-[0-9]*\).*$/\1/p')"
 if [ -z "$bug" ]; then
 	echo "You need to spécify a Jira ID (example : LUTECE-1234)"
 	exit 1
-elsif [ $(wc -l <<< "$bug") -ne 1 ]; then
+elif [ $(echo "$bug" | wc -l) -ne 1 ]; then
 	echo "I have more than one jira ID. It's better to have one commit per jira ID", $bug
 	exit 2
 else
