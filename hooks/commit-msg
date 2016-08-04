@@ -23,10 +23,13 @@ test "" = "$(grep '^Signed-off-by: ' "$1" |
 	exit 1
 }
 
-bug="$(grep -v '^#' "$1" | sed -n 's/^\([A-Z]*-[0-9]*\).*$/\1/p')"
+bug="$(grep -v '^#' "$1" | sed -n 's/^\s*\([A-Z]*-[0-9]*\).*$/\1/p')"
 if [ -z "$bug" ]; then
 	echo "You need to spécify a Jira ID (example : LUTECE-1234)"
 	exit 1
+elsif [ $(wc -l <<< "$bug") -ne 1 ]; then
+	echo "I have more than one jira ID. It's better to have one commit per jira ID", $bug
+	exit 2
 else
 	summary="$(curl -s "https://dev.lutece.paris.fr/jira/rest/api/latest/issue/$bug" | sed 's/^.*"summary":"\([^\"]*\)",.*$/\1/g' | grep -v '"errorMessages":\[')"
 	if [ -z "$summary" ]; then
