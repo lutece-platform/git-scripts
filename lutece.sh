@@ -26,7 +26,7 @@ function getScripts() {
 	git clone "$url" "${TMPDIR}" ${QUIET}
 	# TODO: Comment it !
 	# during development
-	#git --git-dir="${TMPDIR}/.git" --work-tree="${TMPDIR}" checkout -b develop origin/develop
+	git --git-dir="${TMPDIR}/.git" --work-tree="${TMPDIR}" checkout -b develop origin/develop
 #	rsync -a /home/cmarneux/svn/lutece/tools-git-scripts/ "${TMPDIR}"
 	return $?
 }
