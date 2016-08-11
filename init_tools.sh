@@ -41,20 +41,20 @@ do
 	project=`echo ${projectandurl} | cut -d ';' -f 1`
 	url=`echo ${projectandurl} | cut -d ';' -f 2`
 	category=`echo ${project} | cut -d '-' -f 2`
-	if [[ ${category} == "core" ]]
+	if [[ "${category}" == "core" ]]
 	then
 		path="${project}"
 	else
 		path="tools/${category}/${project}"
 	fi
-	if [[ -d $path ]]
+	if [[ -d "$path" ]]
 	then
 		echo "${project} already cloned in ${path}"
 	else
 		echo "--------------------------------------------------------------------------------"
 		echo " Cloning component : ${project}"
 		echo "--------------------------------------------------------------------------------"
-		git clone ${url} ${path}
+		git clone "${url}" "${path}"
 		echo " "
 	fi
 done;
