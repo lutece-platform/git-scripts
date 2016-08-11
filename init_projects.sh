@@ -32,7 +32,7 @@ function getUserInfos() {
 		read -p "Enter your github's username : " USERNAME
 	done
 	awkProg='/"email"/ {mail=substr($2, 2, length($2)-3)} /"primary"/ {primary=substr($2, 1, length($2)-1)} /"verified"/ {if ($2 == "true" && primary == "true") print mail}'
-	EMAIL="$(curl -s -u $USERNAME https://api.github.com/user/emails | awk "$awkProg")"
+	EMAIL="$(curl -s -u "$USERNAME" https://api.github.com/user/emails | awk "$awkProg")"
 	if [ -z "${EMAIL}" ]; then
 		return 2
 	fi
@@ -138,7 +138,7 @@ done
 getUserInfos
 error $? "You have to validate your primary email in github."
 
-projects=(`getProjectsAndUrls lutece-platform $urltype | grep "^lutece"`)
+projects=(`getProjectsAndUrls lutece-platform "$urltype" | grep "^lutece"`)
 
 for projectandurl in ${projects[*]} 
 do
@@ -152,14 +152,14 @@ do
 	else
 		path="${path}/plugins/${category}/${project}"
 	fi
-	if [[ -d $path ]]
+	if [[ -d "$path" ]]
 	then
 		echo "${project} already cloned in ${path}"
 	else
 		echo "--------------------------------------------------------------------------------"
 		echo " Cloning component : ${project}"
 		echo "--------------------------------------------------------------------------------"
-		git clone ${url} ${path}
+		git clone "${url}" "${path}"
 		git --git-dir="${path}/.git" --work-tree="${path}" checkout -b develop
 		git --git-dir="${path}/.git" --work-tree="${path}" pull origin develop
 		git --git-dir="${path}/.git" --work-tree="${path}" branch --set-upstream-to=origin/develop

@@ -76,7 +76,7 @@ function parseParams() {
 			NAME="$OPTARG"
 			;;
 		:)
-			rror 2 "The option -$OPTARG requires an argument"
+			error 2 "The option -$OPTARG requires an argument"
 			;;
 		h)
 			usage
@@ -112,7 +112,7 @@ function getUserInfos() {
 			break
 		fi
 		awkProg='/"email"/ {mail=substr($2, 2, length($2)-3)} /"primary"/ {primary=substr($2, 1, length($2)-1)} /"verified"/ {if ($2 == "true" && primary == "true") print mail}'
-		EMAIL="$(curl -s -u $USERNAME https://api.github.com/user/emails | awk "$awkProg")"
+		EMAIL="$(curl -s -u "$USERNAME" https://api.github.com/user/emails | awk "$awkProg")"
 	done
 	if [ -z "${EMAIL}" ]; then
 		return 2

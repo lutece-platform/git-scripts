@@ -47,7 +47,7 @@ for project in ${projects[*]}
 do
 	echo "project : $project"
 	category=`echo ${project} | cut -d '-' -f 2`
-	if [[ ${category} == "core" ]]
+	if [[ "${category}" == "core" ]]
 	then
 		path="${project}"
 	else
@@ -58,11 +58,11 @@ do
 		continue
 	fi
 	pushd "${path}" > /dev/null
-	changeBranch ${DEVELOP}
-	if [ -z "$(git branch -r | grep ${DEVELOP})" ]; then
-		runIt "Creating ${DEVELOP} branch" "git push origin ${DEVELOP}"
+	changeBranch "${DEVELOP}"
+	if [ -z "$(git branch -r | grep "${DEVELOP}")" ]; then
+		runIt "Creating ${DEVELOP} branch" "git push origin \"${DEVELOP}\""
 	else
-		runIt "Update ${DEVELOP} branch" "git pull origin ${DEVELOP}"
+		runIt "Update ${DEVELOP} branch" "git pull origin \"${DEVELOP}\""
 	fi
 	changeBranch
 	popd > /dev/null

@@ -23,15 +23,15 @@ repo="https://github.com/lutece-platform/lutece-${category}-$2.git"
 dir="lutece-$3-$2"
 
 echo "Récupération du SVN ${url}"
-git svn clone ${url} ${dir}
-cd ${dir}
+git svn clone "${url}" "${dir}"
+cd "${dir}"
 echo "Liste de auteurs"
 git shortlog -s
 echo "Conversion des auteurs"
 ../change_authors.sh
 echo "Liste de auteurs"
 git shortlog -s
-git remote add origin ${repo}
+git remote add origin "${repo}"
 
 echo "Ajout de fichier .gitignore pour les dossiers vides"
 find . \( ! -regex '.*/\..*/..*' \) -type d -empty -exec touch {}/.gitignore \;

@@ -10,10 +10,10 @@ getUserInfos
 error $? "You have to validate your primary email in github."
 
 error "Retrieving projects list..."
-projects=(`getProjectsAndUrls lutece-platform $CLONETYPE | grep "^lutece"` `getProjectsAndUrls lutece-secteur-public $CLONETYPE`)
+projects=(`getProjectsAndUrls lutece-platform "$CLONETYPE" | grep "^lutece"` `getProjectsAndUrls lutece-secteur-public "$CLONETYPE"`)
 
 for projectandurl in ${projects[@]} ; do
-	data=( $(echo $projectandurl | sed "s/^\([A-Za-z]*\)\-\([^\-]*\)\(\-\([^;]*\)\)\{0,1\};\(.*\)$/\2 \4 \5 \1/g") )
+	data=( $(echo "$projectandurl" | sed "s/^\([A-Za-z]*\)\-\([^\-]*\)\(\-\([^;]*\)\)\{0,1\};\(.*\)$/\2 \4 \5 \1/g") )
 	if [ "${data[$CATEGORY]}" = "core" ]; then
 		path="${BASEPATH}/lutece-core"
 		# project is empty so URL is in PROJECT index
@@ -56,14 +56,14 @@ for projectandurl in ${projects[@]} ; do
 		git --git-dir="${path}/.git" --work-tree="${path}" pull ${QUIET}
 		git --git-dir="${path}/.git" --work-tree="${path}" checkout ${QUIET} develop
 		git --git-dir="${path}/.git" --work-tree="${path}" pull ${QUIET}
-		git --git-dir="${path}/.git" --work-tree="${path}" checkout ${QUIET} $currentBranch
+		git --git-dir="${path}/.git" --work-tree="${path}" checkout ${QUIET} "$currentBranch"
 	setUserInfos "${path}"
 		continue
 	fi
 	echo "--------------------------------------------------------------------------------"
 	echo " Cloning component : ${data[$PROJECT]}"
 	echo "--------------------------------------------------------------------------------"
-	git clone ${QUIET} ${data[$URL]} ${path}
+	git clone ${QUIET} "${data[$URL]}" "${path}"
 	currentBranch="$(git --git-dir="${path}/.git" --work-tree="${path}" rev-parse --abbrev-ref HEAD)"
 	if [ "$currentBranch" = "master" ]; then
 		nextBranch="develop"
@@ -73,11 +73,11 @@ for projectandurl in ${projects[@]} ; do
 		MESSAGES[${#MESSAGES[@]}]="WARNING: No branch master or develop found in project ${data[$PROJECT]}"
 		continue
 	fi
-	git --git-dir="${path}/.git" --work-tree="${path}" checkout ${QUIET} -b $nextBranch origin/$nextBranch
+	git --git-dir="${path}/.git" --work-tree="${path}" checkout ${QUIET} -b "$nextBranch" "origin/$nextBranch"
 	status=$?
-	if [ $status -eq 0 ]; then
+	if [ "$status" -eq 0 ]; then
 		git --git-dir="${path}/.git" --work-tree="${path}" pull ${QUIET}
-	elif [ $status -eq 128 ]; then
+	elif [ "$status" -eq 128 ]; then
 		MESSAGES[${#MESSAGES[@]}]="FATAL: the $nextBranch branch is missing in project ${data[$PROJECT]} in ${data[$CATEGORY]} category."
 	else
 		MESSAGES[${#MESSAGES[@]}]="FATAL: Unknown error in GIT in project ${data[$PROJECT]} in ${data[$CATEGORY]} category (return $status)."
