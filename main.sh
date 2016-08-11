@@ -76,7 +76,7 @@ function parseParams() {
 			NAME="$OPTARG"
 			;;
 		:)
-			rror 2 "The option -$OPTARG requires an argument"
+			error 2 "The option -$OPTARG requires an argument"
 			;;
 		h)
 			usage
