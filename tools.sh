@@ -44,7 +44,7 @@ function getLocalProjects() {
 # or returns 1 if not cloned yet
 function projectInfos() {
 	PROJECTINFO=()
-	if [ $# -gt 0 -a ${#LOCALPROJECTS[@]} -gt 0 ]; then
+	if [ $# -gt 0 -a ${LOCALPROJECTS[$1]+_} ]; then
 		project=( $(echo "${LOCALPROJECTS[$1]}" | sed "s/^\([^;]*\);\(.*\)$/\1 \2/g") )
 		if [ "${project[0]}" = "lutece-core" ]; then
 			category="core"
