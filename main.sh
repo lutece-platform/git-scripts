@@ -12,7 +12,7 @@ NAME=""
 GITHOOKS=1
 QUIET=("-q")
 SEARCH_TYPE=$SEARCH_LOCAL
-LOCALPROJECTS=()
+declare -A LOCALPROJECTS=()
 PROJECTINFOS=()
 
 # display usage then exit with code 2
@@ -147,7 +147,9 @@ getPath $nextParameter "$@"
 getLocalProjects
 # set NAME and EMAIL with first already cloned repository if not set in command line
 if [ -z "${NAME}" -a -z "${EMAIL}" -a ${#LOCALPROJECTS[@]} -gt 0 ]; then
-	path="$(echo "${LOCALPROJECTS[0]}" | cut -d ';' -f 2)"
+	allkeys=(${!LOCALPROJECTS[@]})
+	randomkey=${allkeys[0]}
+	path="$(echo "${LOCALPROJECTS[$randomkey]}" | cut -d ';' -f 2)"
 	NAME="$(git --git-dir="${path}/.git" --work-tree="${path}" config user.name)"
 	EMAIL="$(git --git-dir="${path}/.git" --work-tree="${path}" config user.email)"
 fi

@@ -33,7 +33,7 @@ function getLocalProjects() {
 				mv "$path" "${categoryPath}/$project"
 			fi
 		fi
-		LOCALPROJECTS[${#LOCALPROJECTS[@]}]="${project};$path"
+		LOCALPROJECTS[${project}]="${project};$path"
 	done; unset IFS
 	cd - > /dev/null
 }
@@ -45,21 +45,16 @@ function getLocalProjects() {
 function projectInfos() {
 	PROJECTINFO=()
 	if [ $# -gt 0 -a ${#LOCALPROJECTS[@]} -gt 0 ]; then
-		IFS=$'\n'; for projectinfo in ${LOCALPROJECTS[@]}; do
-		unset IFS
-			project=( $(echo "$projectinfo" | sed "s/^\([^;]*\);\(.*\)$/\1 \2/g") )
-			if [ "$1" = "${project[0]}" ]; then
-				if [ "${project[0]}" = "lutece-core" ]; then
-					category="core"
-				elif [ "${project[0]}" = "lutece-platform.github.io" ]; then
-					category="platform.github.io"
-				else
-					category="$(basename "`dirname "${project[1]}"`")"
-				fi
-				PROJECTINFO=( "$category" ${project[@]} )
-				return 0
-			fi
-		done; unset IFS
+		project=( $(echo "${LOCALPROJECTS[$1]}" | sed "s/^\([^;]*\);\(.*\)$/\1 \2/g") )
+		if [ "${project[0]}" = "lutece-core" ]; then
+			category="core"
+		elif [ "${project[0]}" = "lutece-platform.github.io" ]; then
+			category="platform.github.io"
+		else
+			category="$(basename "`dirname "${project[1]}"`")"
+		fi
+		PROJECTINFO=( "$category" ${project[@]} )
+		return 0
 	fi
 	return 1
 }
