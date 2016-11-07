@@ -52,11 +52,15 @@ for projectandurl in ${projects[@]} ; do
 		# try to update...
 		# TODO: check if modifications not commited before changing branches...
 		currentBranch="$(git --git-dir="${path}/.git" --work-tree="${path}" rev-parse --abbrev-ref HEAD)"
-		git --git-dir="${path}/.git" --work-tree="${path}" checkout ${QUIET} master
+		if [ "$currentBranch" != "master" ]; then
+			git --git-dir="${path}/.git" --work-tree="${path}" checkout ${QUIET} master
+		fi
 		git --git-dir="${path}/.git" --work-tree="${path}" pull ${QUIET}
 		git --git-dir="${path}/.git" --work-tree="${path}" checkout ${QUIET} develop
 		git --git-dir="${path}/.git" --work-tree="${path}" pull ${QUIET}
-		git --git-dir="${path}/.git" --work-tree="${path}" checkout ${QUIET} "$currentBranch"
+		if [ "$currentBranch" != "develop" ]; then
+			git --git-dir="${path}/.git" --work-tree="${path}" checkout ${QUIET} "$currentBranch"
+		fi
 	setUserInfos "${path}"
 		continue
 	fi
