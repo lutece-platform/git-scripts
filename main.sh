@@ -12,7 +12,7 @@ NAME=""
 GITHOOKS=1
 QUIET=("-q")
 SEARCH_TYPE=$SEARCH_LOCAL
-LOCALPROJECTS=()
+declare -A LOCALPROJECTS=()
 PROJECTINFOS=()
 
 # display usage then exit with code 2
@@ -111,7 +111,7 @@ function getUserInfos() {
 		if [ -n "${EMAIL}" ]; then
 			break
 		fi
-		awkProg='/"email"/ {mail=substr($2, 2, length($2)-3)} /"primary"/ {primary=substr($2, 1, length($2)-1)} /"verified"/ {if ($2 == "true" && primary == "true") print mail}'
+		awkProg='/"email"/ {mail=substr($2, 2, length($2)-3)} /"primary"/ {primary=substr($2, 1, length($2)-1)} /"verified"/ {if ($2 == "true," && primary == "true") print mail}'
 		EMAIL="$(curl -s -u "$USERNAME" https://api.github.com/user/emails | awk "$awkProg")"
 	done
 	if [ -z "${EMAIL}" ]; then
@@ -147,7 +147,9 @@ getPath $nextParameter "$@"
 getLocalProjects
 # set NAME and EMAIL with first already cloned repository if not set in command line
 if [ -z "${NAME}" -a -z "${EMAIL}" -a ${#LOCALPROJECTS[@]} -gt 0 ]; then
-	path="$(echo "${LOCALPROJECTS[0]}" | cut -d ';' -f 2)"
+	allkeys=(${!LOCALPROJECTS[@]})
+	randomkey=${allkeys[0]}
+	path="$(echo "${LOCALPROJECTS[$randomkey]}" | cut -d ';' -f 2)"
 	NAME="$(git --git-dir="${path}/.git" --work-tree="${path}" config user.name)"
 	EMAIL="$(git --git-dir="${path}/.git" --work-tree="${path}" config user.email)"
 fi
