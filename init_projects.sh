@@ -31,7 +31,7 @@ function getUserInfos() {
 	while [ -z "${USERNAME}" ]; do
 		read -p "Enter your github's username : " USERNAME
 	done
-	awkProg='/"email"/ {mail=substr($2, 2, length($2)-3)} /"primary"/ {primary=substr($2, 1, length($2)-1)} /"verified"/ {if ($2 == "true" && primary == "true") print mail}'
+	awkProg='/"email"/ {mail=substr($2, 2, length($2)-3)} /"primary"/ {primary=substr($2, 1, length($2)-1)} /"verified"/ {if ($2 == "true," && primary == "true") print mail}'
 	EMAIL="$(curl -s -u "$USERNAME" https://api.github.com/user/emails | awk "$awkProg")"
 	if [ -z "${EMAIL}" ]; then
 		return 2

@@ -111,7 +111,7 @@ function getUserInfos() {
 		if [ -n "${EMAIL}" ]; then
 			break
 		fi
-		awkProg='/"email"/ {mail=substr($2, 2, length($2)-3)} /"primary"/ {primary=substr($2, 1, length($2)-1)} /"verified"/ {if ($2 == "true" && primary == "true") print mail}'
+		awkProg='/"email"/ {mail=substr($2, 2, length($2)-3)} /"primary"/ {primary=substr($2, 1, length($2)-1)} /"verified"/ {if ($2 == "true," && primary == "true") print mail}'
 		EMAIL="$(curl -s -u "$USERNAME" https://api.github.com/user/emails | awk "$awkProg")"
 	done
 	if [ -z "${EMAIL}" ]; then
