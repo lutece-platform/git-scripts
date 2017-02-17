@@ -8,6 +8,7 @@ m=$GIT_AUTHOR_EMAIL
 case ${GIT_AUTHOR_NAME} in
         "ILE") n="isabelle-lenain" ; m="isabelle-lenain@users.noreply.github.com" ;;
         "PLE") n="pierrelevy" ; m="pierrelevy@users.noreply.github.com" ;;
+        "JHA") n="Jon Harper" ; m="jon.harper87@gmail.com" ;;
         "JGO") n="jgoulley" ; m="jgoulley@users.noreply.github.com" ;;
         "EJO") n="elysajouve" ; m="elysajouve@users.noreply.github.com" ;;
         "LHO") n="hohll" ; m="hohll@users.noreply.github.com" ;;
