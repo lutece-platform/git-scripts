@@ -14,6 +14,9 @@ projects=(`getProjectsAndUrls lutece-platform "$CLONETYPE" | grep "^lutece"` `ge
 
 for projectandurl in ${projects[@]} ; do
 	data=( $(echo "$projectandurl" | sed "s/^\([A-Za-z]*\)\-\([^\-]*\)\(\-\([^;]*\)\)\{0,1\};\(.*\)$/\2 \4 \5 \1/g") )
+	if [ "${data[$CATEGORY]}" != "${CHOSEN_CATEGORY}" -a -n "${CHOSEN_CATEGORY}" ]; then
+		continue
+	fi
 	if [ "${data[$CATEGORY]}" = "core" ]; then
 		path="${BASEPATH}/lutece-core"
 		# project is empty so URL is in PROJECT index

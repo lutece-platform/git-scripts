@@ -18,7 +18,8 @@ Options
 	sync
 		-t <protocol>
 			use this protocol for cloning (available: http, https, git and ssh; default is https)
-
+		-c <category>
+			limit the sync action to a specific category
 	search
 		-l 
 			search only in local directories (default)

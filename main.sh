@@ -14,6 +14,7 @@ QUIET=("-q")
 SEARCH_TYPE=$SEARCH_LOCAL
 declare -A LOCALPROJECTS=()
 PROJECTINFOS=()
+CHOSEN_CATEGORY=""
 
 # display usage then exit with code 2
 function usage() {
@@ -39,7 +40,7 @@ function parseParams() {
 	fi
 	shift
 	CLONETYPE="clone_url"
-	while getopts ":de:klrt:u:" opt; do
+	while getopts ":de:klrt:c:u:" opt; do
 		case $opt in
 		d)
 			QUIET=""
@@ -71,6 +72,9 @@ function parseParams() {
 				*)
 					error 10 "$OPTARG is an invalid clone type"
 			esac
+			;;
+		c)
+			CHOSEN_CATEGORY="$OPTARG"
 			;;
 		u)
 			NAME="$OPTARG"
